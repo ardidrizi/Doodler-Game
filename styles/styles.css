@@ -18,6 +18,13 @@ body {
   overflow: hidden;
 }
 
+.platform {
+  width: 85px;
+  height: 15px;
+  background-color: green;
+  position: absolute;
+}
+
 /* .doodler {
   width: 60px;
   height: 60px;

@@ -19,51 +19,137 @@ class Doodler {
     this.container.appendChild(this.doodlerElement);
 
     this.isJumping = false;
+    this.isFalling = false;
     this.isMovingLeft = false;
     this.isMovingRight = false;
+
+    this.jumpInterval = null;
+    this.fallInterval = null;
+
+    this.platforms = [];
+    this.platformCount = 5;
+
+    // Create platforms
+    this.createPlatforms();
 
     // Start the jump action when the doodler is created
     this.jump();
 
     // Listen for keyboard events
-    document.addEventListener("keydown", this.control.bind(this)); // Bind "this" to ensure correct context
-    document.addEventListener("keyup", this.stopMoving.bind(this)); // Stop moving on key release
+    document.addEventListener("keydown", this.control.bind(this));
+    document.addEventListener("keyup", this.stopMoving.bind(this));
   }
 
-  // Update doodler's position in the game container
+  createPlatforms() {
+    let platformGap = this.container.offsetHeight / this.platformCount;
+    for (let i = 0; i < this.platformCount; i++) {
+      let bottomSpace = i * platformGap;
+      let platform = new Platform(this.container, bottomSpace);
+      this.platforms.push(platform);
+      console.log(
+        `Platform ${i} created at bottom: ${bottomSpace}, left: ${platform.leftSpace}`
+      );
+    }
+  }
+
   updatePosition() {
     this.doodlerElement.style.left = `${this.leftSpace}px`;
     this.doodlerElement.style.bottom = `${this.bottomSpace}px`;
   }
 
-  // Make the doodler jump
+  clearIntervals() {
+    if (this.jumpInterval) clearInterval(this.jumpInterval);
+    if (this.fallInterval) clearInterval(this.fallInterval);
+  }
+
   jump() {
+    console.log("Jumping...");
     this.isJumping = true;
-    let jumpHeight = 200;
-    let jumpInterval = setInterval(() => {
+    this.jumpInterval = setInterval(() => {
       if (this.bottomSpace >= 350) {
-        clearInterval(jumpInterval);
+        console.log("Max height reached, start falling...");
+        clearInterval(this.jumpInterval);
         this.fall();
       }
+
+      if (this.bottomSpace > 250) {
+        this.container.style.transform = `translateY(${-(
+          this.bottomSpace - 250
+        )}px)`;
+        this.checkPlatforms(); // Check for new platforms as the Doodler rises
+      }
+
       this.bottomSpace += 20;
       this.updatePosition();
+      this.updateScore();
     }, 30);
   }
 
-  // Make the doodler fall
   fall() {
+    console.log("Falling...");
     this.isJumping = false;
-    let fallInterval = setInterval(() => {
+    this.isFalling = true;
+
+    this.fallInterval = setInterval(() => {
       if (this.bottomSpace <= 0) {
-        clearInterval(fallInterval);
-        console.log("Doodler has hit the ground!");
+        this.bottomSpace = 0; // Prevent falling below ground level
+        clearInterval(this.fallInterval);
+        console.log("Doodler hit the ground!");
+        this.endGame(); // Handle end of game
+        return;
       }
+
+      this.platforms.forEach((platform) => {
+        if (
+          this.bottomSpace >= platform.bottomSpace &&
+          this.bottomSpace <= platform.bottomSpace + 15 &&
+          this.leftSpace + 60 >= platform.leftSpace &&
+          this.leftSpace <= platform.leftSpace + 85 &&
+          !this.isJumping
+        ) {
+          console.log("Landed on a platform!");
+          clearInterval(this.fallInterval);
+          this.jump();
+          this.updateScore();
+
+          // Move all platforms down to simulate rising
+          this.platforms.forEach((p) => {
+            p.bottomSpace -= 10;
+            p.platformElement.style.bottom = `${p.bottomSpace}px`;
+          });
+
+          this.checkPlatforms(); // Check for new platforms as well
+        }
+      });
+
       this.bottomSpace -= 5;
       this.updatePosition();
     }, 30);
   }
 
-  // Handle left and right movement
+  // Check for new platforms to create
+  checkPlatforms() {
+    // Create a new platform if the Doodler reaches a certain height
+    if (this.bottomSpace > this.container.offsetHeight - 100) {
+      this.createNewPlatform();
+    }
+
+    // Remove platforms that are below the visible area
+    this.platforms.forEach((platform, index) => {
+      if (platform.bottomSpace < 0) {
+        platform.platformElement.remove(); // Remove from DOM
+        this.platforms.splice(index, 1); // Remove from the platforms array
+      }
+    });
+  }
+
+  createNewPlatform() {
+    const newPlatformBottom = this.container.offsetHeight; // Create a new platform at the top
+    const platform = new Platform(this.container, newPlatformBottom);
+    this.platforms.push(platform);
+    console.log(`New platform created at bottom: ${newPlatformBottom}`);
+  }
+
   control(e) {
     if (e.key === "ArrowLeft" && !this.isMovingLeft) {
       this.isMovingLeft = true;
@@ -74,7 +160,6 @@ class Doodler {
     }
   }
 
-  // Stop movement when arrow keys are released
   stopMoving(e) {
     if (e.key === "ArrowLeft") {
       this.isMovingLeft = false;
@@ -83,33 +168,29 @@ class Doodler {
     }
   }
 
-  // Move doodler to the left
   moveLeft() {
     let moveInterval = setInterval(() => {
       if (this.isMovingLeft && this.leftSpace > 0) {
-        // Ensure doodler doesn't go outside left boundary
         this.leftSpace -= 5;
         this.updatePosition();
       } else {
         clearInterval(moveInterval);
       }
-    }, 20); // Speed of left movement
+    }, 20);
   }
 
-  // Move doodler to the right
   moveRight() {
     let moveInterval = setInterval(() => {
       if (
         this.isMovingRight &&
         this.leftSpace < this.container.offsetWidth - 60
       ) {
-        // Ensure doodler doesn't go outside right boundary
         this.leftSpace += 5;
         this.updatePosition();
       } else {
         clearInterval(moveInterval);
       }
-    }, 20); // Speed of right movement
+    }, 20);
   }
 }
 
