@@ -1,0 +1,3 @@
+class Platform {
+  // To do
+}
