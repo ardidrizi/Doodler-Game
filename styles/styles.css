@@ -1,0 +1,64 @@
+/* styles.css */
+body {
+  margin: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f8ff;
+}
+
+.game-container {
+  width: 400px;
+  height: 600px;
+  background-color: #87ceeb;
+  border: 2px solid black;
+  position: relative;
+  overflow: hidden;
+}
+
+/* .doodler {
+  width: 60px;
+  height: 60px;
+  background-color: #ff6347;
+  position: absolute;
+  bottom: 100px;
+  left: 170px;
+  border-radius: 10px;
+} */
+/* 
+.platform {
+  width: 85px;
+  height: 20px;
+  background-color: green;
+  position: absolute;
+} */
+
+.score {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 24px;
+  color: white;
+  font-family: Arial, sans-serif;
+  z-index: 1;
+}
+
+#start-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px 20px;
+  font-size: 24px;
+  background-color: #ff6347;
+  color: white;
+  border: none;
+  cursor: pointer;
+  z-index: 1;
+}
+
+#start-button.hidden {
+  display: none;
+}
