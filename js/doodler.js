@@ -28,9 +28,10 @@ class Doodler {
 
     this.platforms = [];
     this.platformCount = 5;
+    this.score = 0;
 
     // Create platforms
-    this.createPlatforms();
+    this.createInitialPlatforms();
 
     // Start the jump action when the doodler is created
     this.jump();
@@ -38,17 +39,24 @@ class Doodler {
     // Listen for keyboard events
     document.addEventListener("keydown", this.control.bind(this));
     document.addEventListener("keyup", this.stopMoving.bind(this));
+
+    // Create score display
+    this.createScoreBoard();
   }
 
-  createPlatforms() {
+  createScoreBoard() {
+    this.scoreBoard = document.createElement("div");
+    this.scoreBoard.className = "score-board";
+    this.scoreBoard.innerText = `Score: ${this.score}`;
+    this.container.appendChild(this.scoreBoard);
+  }
+
+  createInitialPlatforms() {
     let platformGap = this.container.offsetHeight / this.platformCount;
     for (let i = 0; i < this.platformCount; i++) {
-      let bottomSpace = i * platformGap;
+      let bottomSpace = i * platformGap + 50;
       let platform = new Platform(this.container, bottomSpace);
       this.platforms.push(platform);
-      console.log(
-        `Platform ${i} created at bottom: ${bottomSpace}, left: ${platform.leftSpace}`
-      );
     }
   }
 
@@ -63,41 +71,40 @@ class Doodler {
   }
 
   jump() {
-    console.log("Jumping...");
     this.isJumping = true;
+    this.clearIntervals();
+    this.newPlatformCreated = false;
+
     this.jumpInterval = setInterval(() => {
-      if (this.bottomSpace >= 350) {
-        console.log("Max height reached, start falling...");
+      if (this.bottomSpace >= 250) {
         clearInterval(this.jumpInterval);
         this.fall();
       }
 
-      if (this.bottomSpace > 250) {
-        this.container.style.transform = `translateY(${-(
-          this.bottomSpace - 250
-        )}px)`;
-        this.checkPlatforms(); // Check for new platforms as the Doodler rises
-      }
-
-      this.bottomSpace += 20;
+      this.bottomSpace += 15; // Control jump height
       this.updatePosition();
-      this.updateScore();
+      this.movePlatforms(-15);
+
+      // Create new platform at a controlled height
+      if (this.bottomSpace >= 250 && !this.newPlatformCreated) {
+        this.createSinglePlatformAbove();
+        this.newPlatformCreated = true; // Only create one new platform per jump
+      }
     }, 30);
   }
 
   fall() {
-    console.log("Falling...");
     this.isJumping = false;
     this.isFalling = true;
 
     this.fallInterval = setInterval(() => {
       if (this.bottomSpace <= 0) {
-        this.bottomSpace = 0; // Prevent falling below ground level
         clearInterval(this.fallInterval);
-        console.log("Doodler hit the ground!");
-        this.endGame(); // Handle end of game
+        this.endGame();
         return;
       }
+
+      let landed = false;
 
       this.platforms.forEach((platform) => {
         if (
@@ -107,47 +114,45 @@ class Doodler {
           this.leftSpace <= platform.leftSpace + 85 &&
           !this.isJumping
         ) {
-          console.log("Landed on a platform!");
           clearInterval(this.fallInterval);
           this.jump();
           this.updateScore();
-
-          // Move all platforms down to simulate rising
-          this.platforms.forEach((p) => {
-            p.bottomSpace -= 10;
-            p.platformElement.style.bottom = `${p.bottomSpace}px`;
-          });
-
-          this.checkPlatforms(); // Check for new platforms as well
+          landed = true;
         }
       });
 
-      this.bottomSpace -= 5;
+      if (!landed) {
+        this.bottomSpace -= 5; // Falling speed
+      }
+
       this.updatePosition();
     }, 30);
   }
 
-  // Check for new platforms to create
-  checkPlatforms() {
-    // Create a new platform if the Doodler reaches a certain height
-    if (this.bottomSpace > this.container.offsetHeight - 100) {
-      this.createNewPlatform();
-    }
+  movePlatforms(offset) {
+    this.platforms.forEach((platform) => {
+      platform.bottomSpace += offset;
+      platform.platformElement.style.bottom = `${platform.bottomSpace}px`;
 
-    // Remove platforms that are below the visible area
-    this.platforms.forEach((platform, index) => {
+      // Remove platforms that move off the screen
       if (platform.bottomSpace < 0) {
-        platform.platformElement.remove(); // Remove from DOM
-        this.platforms.splice(index, 1); // Remove from the platforms array
+        platform.platformElement.remove();
+        this.platforms.shift(); // Remove the platform from the array
       }
     });
   }
 
-  createNewPlatform() {
-    const newPlatformBottom = this.container.offsetHeight; // Create a new platform at the top
-    const platform = new Platform(this.container, newPlatformBottom);
-    this.platforms.push(platform);
-    console.log(`New platform created at bottom: ${newPlatformBottom}`);
+  createSinglePlatformAbove() {
+    const highestPlatform = Math.max(
+      ...this.platforms.map((p) => p.bottomSpace)
+    );
+    const newPlatform = new Platform(this.container, highestPlatform + 100); // Add 100px above the highest platform
+    this.platforms.push(newPlatform);
+  }
+
+  updateScore() {
+    this.score += 1;
+    this.scoreBoard.innerText = `Score: ${this.score}`;
   }
 
   control(e) {
@@ -191,6 +196,12 @@ class Doodler {
         clearInterval(moveInterval);
       }
     }, 20);
+  }
+
+  endGame() {
+    console.log("Game Over!");
+    this.container.innerHTML = ""; // Clear the game container
+    this.container.innerText = "Game Over! Refresh to restart."; // Inform the player
   }
 }
 
