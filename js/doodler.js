@@ -27,34 +27,46 @@ class Doodler {
     this.fallInterval = null;
 
     this.platforms = [];
-    this.platformCount = 5;
+    this.platformCount = 5; // Reduced number of platforms
     this.score = 0;
+    this.maxJumps = 3; // Maximum jump count
+    this.currentJumps = 0; // Track current jump count
+
+    // Create score display
+    this.createScoreBoard();
 
     // Create platforms
     this.createInitialPlatforms();
 
-    // Start the jump action when the doodler is created
-    this.jump();
-
     // Listen for keyboard events
     document.addEventListener("keydown", this.control.bind(this));
     document.addEventListener("keyup", this.stopMoving.bind(this));
-
-    // Create score display
-    this.createScoreBoard();
   }
 
   createScoreBoard() {
+    // Remove any existing score display
+    const existingScoreBoard = document.querySelector(".score-board");
+    if (existingScoreBoard) {
+      existingScoreBoard.remove();
+    }
+
+    // Create a new score display
     this.scoreBoard = document.createElement("div");
     this.scoreBoard.className = "score-board";
     this.scoreBoard.innerText = `Score: ${this.score}`;
     this.container.appendChild(this.scoreBoard);
   }
 
+  updateScore() {
+    this.score += 1;
+    this.scoreBoard.innerText = `Score: ${this.score}`;
+    console.log(`Score Updated: ${this.score}`);
+  }
+
   createInitialPlatforms() {
-    let platformGap = this.container.offsetHeight / this.platformCount;
+    let platformGap = this.container.offsetHeight / (this.platformCount + 1);
     for (let i = 0; i < this.platformCount; i++) {
-      let bottomSpace = i * platformGap + 50;
+      let bottomSpace = (i + 1) * platformGap; // Adjust to create space between platforms
       let platform = new Platform(this.container, bottomSpace);
       this.platforms.push(platform);
     }
@@ -63,6 +75,9 @@ class Doodler {
   updatePosition() {
     this.doodlerElement.style.left = `${this.leftSpace}px`;
     this.doodlerElement.style.bottom = `${this.bottomSpace}px`;
+    console.log(
+      `Doodler Position - Left: ${this.leftSpace}, Bottom: ${this.bottomSpace}`
+    );
   }
 
   clearIntervals() {
@@ -71,31 +86,46 @@ class Doodler {
   }
 
   jump() {
+    if (this.isJumping || this.currentJumps >= this.maxJumps) return; // Prevent multiple jumps or exceeding jump limit
+
     this.isJumping = true;
     this.clearIntervals();
     this.newPlatformCreated = false;
 
+    console.log("Doodler is jumping");
+
     this.jumpInterval = setInterval(() => {
-      if (this.bottomSpace >= 250) {
+      if (this.bottomSpace >= 250 + 75) {
+        // Adjust height threshold to allow jumping higher
         clearInterval(this.jumpInterval);
         this.fall();
+        return;
       }
 
-      this.bottomSpace += 15; // Control jump height
+      this.bottomSpace += 10; // Adjusted jump height
       this.updatePosition();
-      this.movePlatforms(-15);
+      this.movePlatforms(-5); // Reduce the upward movement of platforms
 
-      // Create new platform at a controlled height
-      if (this.bottomSpace >= 250 && !this.newPlatformCreated) {
+      // Create new platform above if applicable
+      if (this.bottomSpace >= 200 && !this.newPlatformCreated) {
+        // Controlled height for creating platform
         this.createSinglePlatformAbove();
         this.newPlatformCreated = true; // Only create one new platform per jump
+        console.log("Created new platform above");
       }
+
+      // Ensure platforms scroll up as the Doodler jumps
+      this.scrollPlatforms();
     }, 30);
+
+    this.currentJumps++; // Increment the jump count
   }
 
   fall() {
     this.isJumping = false;
     this.isFalling = true;
+
+    console.log("Doodler is falling");
 
     this.fallInterval = setInterval(() => {
       if (this.bottomSpace <= 0) {
@@ -111,13 +141,22 @@ class Doodler {
           this.bottomSpace >= platform.bottomSpace &&
           this.bottomSpace <= platform.bottomSpace + 15 &&
           this.leftSpace + 60 >= platform.leftSpace &&
-          this.leftSpace <= platform.leftSpace + 85 &&
-          !this.isJumping
+          this.leftSpace <= platform.leftSpace + platform.width // Use platform width here
         ) {
-          clearInterval(this.fallInterval);
-          this.jump();
-          this.updateScore();
+          // Doodler lands on a platform
           landed = true;
+          this.bottomSpace = platform.bottomSpace + 15; // Set Doodler right above the platform
+          this.updatePosition();
+          console.log("Doodler landed on a platform");
+
+          // Reset jump count when landing on a platform
+          this.currentJumps = 0;
+
+          // Update score only if the Doodler just jumped
+          if (this.isJumping) {
+            this.updateScore(); // Increment score when landing
+            this.isJumping = false; // Reset jumping status
+          }
         }
       });
 
@@ -146,26 +185,34 @@ class Doodler {
     const highestPlatform = Math.max(
       ...this.platforms.map((p) => p.bottomSpace)
     );
-    const newPlatform = new Platform(this.container, highestPlatform + 100); // Add 100px above the highest platform
+    const newPlatform = new Platform(this.container, highestPlatform + 80); // Adjust for better visibility
     this.platforms.push(newPlatform);
   }
 
-  updateScore() {
-    this.score += 1;
-    this.scoreBoard.innerText = `Score: ${this.score}`;
+  scrollPlatforms() {
+    // Move platforms up when the Doodler jumps high
+    if (this.bottomSpace >= 200) {
+      this.movePlatforms(-2); // Adjust this value to control how much slower the platforms move
+    }
   }
 
   control(e) {
+    console.log(`Key pressed: ${e.key}`);
+
     if (e.key === "ArrowLeft" && !this.isMovingLeft) {
       this.isMovingLeft = true;
       this.moveLeft();
     } else if (e.key === "ArrowRight" && !this.isMovingRight) {
       this.isMovingRight = true;
       this.moveRight();
+    } else if (e.key === "ArrowUp") {
+      this.jump(); // Allow jumping only when Up Arrow is pressed
     }
   }
 
   stopMoving(e) {
+    console.log(`Key released: ${e.key}`);
+
     if (e.key === "ArrowLeft") {
       this.isMovingLeft = false;
     } else if (e.key === "ArrowRight") {
@@ -204,9 +251,3 @@ class Doodler {
     this.container.innerText = "Game Over! Refresh to restart."; // Inform the player
   }
 }
-
-// Initialize the doodler when DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
-  const gameContainer = document.querySelector(".game-container");
-  new Doodler(gameContainer);
-});
