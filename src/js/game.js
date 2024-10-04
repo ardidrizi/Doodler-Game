@@ -1,17 +1,21 @@
 class Game {
   constructor(container) {
     this.container = container;
-    this.doodler = new Doodler(this.container);
-    this.platforms = this.doodler.platforms; // Reference to platforms created in Doodler
+    this.doodler = new Doodler(this.container); // Initialize Doodler and platforms
     this.isGameOver = false;
 
     this.init();
   }
 
   init() {
-    // Any initialization logic can go here
-    // e.g., setting up score, listening to events, etc.
+    // Initialize the game, create score display
     this.createScoreBoard();
+
+    // Update scoreboard periodically
+    this.updateScoreBoard();
+
+    // Start the game by making the doodler jump
+    this.doodler.jump();
   }
 
   createScoreBoard() {
@@ -19,12 +23,12 @@ class Game {
     this.scoreBoard.className = "score-board";
     this.scoreBoard.innerText = `Score: ${this.doodler.score}`;
     this.container.appendChild(this.scoreBoard);
+  }
 
-    // Update the score display every time the score changes
-    this.doodler.updateScore = () => {
-      this.doodler.score += 1;
+  updateScoreBoard() {
+    setInterval(() => {
       this.scoreBoard.innerText = `Score: ${this.doodler.score}`;
-    };
+    }, 100); // Update the score every 100ms to reflect the changes
   }
 
   endGame() {

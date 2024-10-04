@@ -1,71 +1,199 @@
-/* styles.css */
 body {
   margin: 0;
-  overflow: hidden;
+  padding: 0;
+  font-family: "Arial", sans-serif;
+  background-color: #f0f0f0;
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f0f8ff;
 }
 
+/* Styling for the game container */
 .game-container {
+  position: relative;
   width: 400px;
   height: 600px;
-  background-color: #87ceeb;
+  background-color: #cce7ff; /* Light blue sky */
+  background-image: linear-gradient(
+    to top,
+    #87cefa,
+    #cce7ff
+  ); /* Gradient for sky effect */
   border: 2px solid black;
-  position: relative;
   overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); /* Add a shadow around the container */
+}
+/* Sky background with a gradient and moving clouds */
+.game-container {
+  position: relative;
+  width: 800px;
+  height: 600px;
+  background: linear-gradient(to top, #87ceeb 60%, #e0f7fa);
+  border: 2px solid black;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 }
 
+/* Sun in the background */
+.sun {
+  position: absolute;
+  top: 50px;
+  left: 300px;
+  width: 100px;
+  height: 100px;
+  background-color: #f7e88d; /* Sun color */
+  border-radius: 50%;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5); /* Glow effect */
+  z-index: 1;
+}
+
+/* Cloud styling */
+.cloud {
+  position: absolute;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.cloud::before,
+.cloud::after {
+  content: "";
+  position: absolute;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Different parts of the cloud */
+.cloud::before {
+  width: 50px;
+  height: 40px;
+  top: -20px;
+  left: 10px;
+}
+
+.cloud::after {
+  width: 60px;
+  height: 50px;
+  top: -25px;
+  right: 10px;
+}
+
+/* Cloud animation */
+@keyframes moveClouds {
+  0% {
+    left: -100px;
+  }
+  100% {
+    left: 500px;
+  }
+}
+
+.cloud {
+  animation: moveClouds 30s linear infinite;
+}
+
+/* Styling for multiple clouds */
+.cloud.small {
+  width: 60px;
+  height: 35px;
+  top: 100px;
+  animation-duration: 20s; /* Faster for smaller cloud */
+}
+
+.cloud.medium {
+  width: 80px;
+  height: 50px;
+  top: 50px;
+  animation-duration: 25s;
+}
+
+.cloud.large {
+  width: 120px;
+  height: 70px;
+  top: 150px;
+  animation-duration: 35s; /* Slower for larger cloud */
+}
+
+/* Base platform style */
 .platform {
+  position: absolute;
   width: 85px;
   height: 15px;
-  background-color: green;
+  border-radius: 5px;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3); /* Basic shadow for all platforms */
+}
+
+/* Grass platform */
+.platform.grass {
+  background: linear-gradient(
+    to top,
+    #654321 60%,
+    #32a852 40%
+  ); /* Dirt to grass gradient */
+  border: 1px solid #2e8b57;
+}
+
+/* Stone platform */
+.platform.stone {
+  background: radial-gradient(
+    circle,
+    #b0b0b0,
+    #808080
+  ); /* Stone-like gradient */
+  border: 1px solid #606060;
+}
+
+/* Wooden platform */
+.platform.wood {
+  background: linear-gradient(
+    to top,
+    #8b4513 50%,
+    #d2691e 50%
+  ); /* Wood plank */
+  border: 1px solid #654321;
+}
+
+/* Basic styling for the coins */
+.coin {
+  width: 20px;
+  height: 20px;
+  background-color: #ffd700; /* Gold color */
+  border-radius: 50%;
+  border: 2px solid #ffcc00;
+  box-shadow: 0 0 10px rgba(255, 223, 0, 0.5); /* Glowing effect */
   position: absolute;
 }
 
-/* .doodler {
-  width: 60px;
-  height: 60px;
-  background-color: #ff6347;
-  position: absolute;
-  bottom: 100px;
-  left: 170px;
-  border-radius: 10px;
-} */
-/* 
-.platform {
-  width: 85px;
-  height: 20px;
-  background-color: green;
-  position: absolute;
-} */
+/* Coin disappearing animation */
+@keyframes coinDisappear {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
 
-.score {
+/* Coin disappears with fade and scale effect */
+.coin.disappearing {
+  animation: coinDisappear 0.5s ease forwards;
+  opacity: 0; /* Ensure opacity is set to 0 */
+  transform: scale(0.5); /* Ensure scale is reduced */
+}
+
+/* Applying the disappearing effect to the coin */
+
+/* Scoreboard styling */
+.score-board {
   position: absolute;
   top: 10px;
-  left: 10px;
+  right: 10px;
   font-size: 24px;
   color: white;
-  font-family: Arial, sans-serif;
-  z-index: 1;
-}
-
-#start-button {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 10px 20px;
-  font-size: 24px;
-  background-color: #ff6347;
-  color: white;
-  border: none;
-  cursor: pointer;
-  z-index: 1;
-}
-
-#start-button.hidden {
-  display: none;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 5px;
+  z-index: 100;
 }
