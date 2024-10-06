@@ -30,16 +30,22 @@ class Game {
       this.scoreBoard.innerText = `Score: ${this.doodler.score}`;
     }, 100); // Update the score every 100ms to reflect the changes
   }
-
-  endGame() {
-    this.isGameOver = true;
-    alert("Game Over! Refresh to restart."); // Show game over message
-    this.container.innerHTML = ""; // Clear the game container
-  }
 }
 
 // Initialize the game when DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
+const startButton = document.querySelector("#start-button");
+console.log(startButton);
+
+// restartButton.addEventListener("click", () => {
+//   location.reload();
+// });
+
+// console.log(startButton);
+startButton.addEventListener("click", () => {
+  // show the game container
+  document.querySelector(".instruction-container").style.display = "none";
+  document.querySelector(".game-container").style.display = "block";
+
   const gameContainer = document.querySelector(".game-container");
   new Game(gameContainer);
 });

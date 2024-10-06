@@ -7,23 +7,38 @@
     <link rel="stylesheet" href="styles/styles.css" />
   </head>
   <body>
-    <div class="game-container">
-      <div class="sun"></div>
+    <!-- Instruction container should be outside of game-container -->
+    <div class="instruction-container">
+      <h1>Welcome to Doodle Jump!</h1>
+      <p>Instructions:</p>
+      <ul>
+        <li>Use the arrow keys to move left or right.</li>
+        <li>
+          Jump on platforms to go higher and collect coins for extra points!
+        </li>
+        <li>Avoid falling to the bottom of the screen!</li>
+      </ul>
+      <button id="start-button">Start Game</button>
+    </div>
 
-      <!-- Moving clouds -->
+    <!-- Game container -->
+    <div class="game-container" style="display: none">
       <div class="cloud small" style="left: 50px"></div>
       <div class="cloud medium" style="left: 200px"></div>
       <div class="cloud large" style="left: 100px"></div>
-
-      <!-- Static mountain and trees -->
       <div class="mountain"></div>
       <div class="tree" style="left: 50px"></div>
       <div class="tree" style="left: 200px"></div>
       <div class="money-board">Money: 0</div>
-      <!-- <div class="score">Score: 0</div> -->
       <div class="doodler"></div>
+
+      <!-- Game Over Container -->
+      <div class="game-over-container" style="display: none">
+        <h1>Game Over</h1>
+        <p>Your final score: <span id="final-score">0</span></p>
+        <button id="reset-button">Play Again</button>
+      </div>
     </div>
-    <!-- <button id="start-button">Start Game</button> -->
 
     <!-- <audio id="jump-sound" src="jump.mp3" preload="auto"></audio> -->
     <!-- <audio id="gameover-sound" src="gameover.mp3" preload="auto"></audio> -->
