@@ -3,6 +3,10 @@ class Doodler {
     this.container = container;
     this.doodlerElement = document.createElement("div");
 
+    this.jumpSound = new Audio("sounds/jump.wav"); // Add jump sound
+    this.collectCoinSound = new Audio("sounds/collect.wav");
+    this.gameOverSound = new Audio("sounds/game_over.wav");
+
     // Set doodler styles
     this.doodlerElement.style.width = "60px";
     this.doodlerElement.style.height = "60px";
@@ -36,19 +40,40 @@ class Doodler {
     this.lastPlatform = null; // Track the last platform Doodler landed on
     this.money = 0; // Track the money collected
 
-    // Listen for keyboard events
-    document.addEventListener("keydown", this.control.bind(this));
-    document.addEventListener("keyup", this.stopMoving.bind(this));
+    // Cache the bound methods for event listeners
+    this.boundControl = this.control.bind(this);
+    this.boundStopMoving = this.stopMoving.bind(this);
+
+    // Listen for keyboard events using the cached functions
+    document.addEventListener("keydown", this.boundControl);
+    document.addEventListener("keyup", this.boundStopMoving);
   }
 
   // Function to update money count after collecting a coin
   collectCoin() {
     this.money += 1;
+    this.collectCoinSound.play(); // Play coin collection sound
     console.log(`Money collected: ${this.money}`);
     document.querySelector(".money-board").innerText = `Money: ${this.money}`;
   }
 
-  // Check landing on platform (also calls checkCoinCollision)
+  // Check coin collision and collect if Doodler lands on it
+  checkCoinCollision(platform) {
+    if (platform.coinElement) {
+      const doodlerLeft = this.leftSpace;
+      const doodlerRight = this.leftSpace + 60;
+      const coinLeft = platform.leftSpace + (platform.width - 20) / 2;
+      const coinRight = coinLeft + 20;
+
+      if (doodlerRight >= coinLeft && doodlerLeft <= coinRight) {
+        // Doodler collides with the coin
+        platform.removeCoin();
+        this.collectCoin(); // Increment money when the coin is collected
+      }
+    }
+  }
+
+  // Check landing on platform and coin collision
   checkLandingOnPlatform() {
     let landedPlatform = null;
     this.platforms.forEach((platform) => {
@@ -63,12 +88,13 @@ class Doodler {
         this.bottomSpace = platform.bottomSpace + 15;
         this.updatePosition();
 
-        // Check if there is a coin to collect on this platform
+        // Check for coin collection on this platform
         this.checkCoinCollision(platform);
       }
     });
-    return landedPlatform; // Return the platform the Doodler landed on
+    return landedPlatform;
   }
+
   createInitialPlatforms() {
     let platformGap = this.container.offsetHeight / (this.platformCount + 1);
     for (let i = 0; i < this.platformCount; i++) {
@@ -95,68 +121,44 @@ class Doodler {
     if (this.isJumping || this.isFalling) return;
 
     this.isJumping = true;
+    this.jumpSound.play(); // Play jump sound
     this.clearIntervals();
 
-    // Make the Doodler jump upwards smoothly
     this.jumpInterval = setInterval(() => {
-      this.bottomSpace += 10; // Control jump height increment (slowed it down)
+      this.bottomSpace += 10; // Control jump height increment
       this.updatePosition();
 
-      // Scroll the game upwards when the doodler is high enough
       if (this.bottomSpace > 250) {
-        this.scrollPlatforms();
+        this.scrollPlatforms(); // Scroll platforms when jumping high enough
       }
 
-      // Stop the jump and start falling when jump reaches its peak
       if (this.bottomSpace > 350) {
         this.fall(); // Start falling after reaching peak
       }
-    }, 30); // Slower interval for smoother movement
+    }, 30); // Smooth jumping
   }
 
   fall() {
-    this.isJumping = false; // Doodler is not jumping anymore
-    this.isFalling = true; // Set falling status
+    this.isJumping = false;
+    this.isFalling = true;
     this.clearIntervals();
 
-    // Make the Doodler fall down smoothly
     this.fallInterval = setInterval(() => {
       this.bottomSpace -= 5; // Control fall speed
       this.updatePosition();
 
-      // Check if landed on a platform
       let platformLandedOn = this.checkLandingOnPlatform();
       if (platformLandedOn) {
-        // Update the score only when the doodler lands on a new, higher platform
         this.updateScore(platformLandedOn);
-        clearInterval(this.fallInterval); // Stop falling once landed
-        this.isFalling = false; // Stop the falling state
+        clearInterval(this.fallInterval); // Stop falling after landing
+        this.isFalling = false;
       }
 
-      // End game if Doodler falls too far
       if (this.bottomSpace <= 0) {
         clearInterval(this.fallInterval);
         this.endGame();
       }
-    }, 30); // Same interval speed as jumping for consistency
-  }
-
-  checkLandingOnPlatform() {
-    let landedPlatform = null;
-    this.platforms.forEach((platform) => {
-      if (
-        this.bottomSpace >= platform.bottomSpace &&
-        this.bottomSpace <= platform.bottomSpace + 15 &&
-        this.leftSpace + 60 >= platform.leftSpace &&
-        this.leftSpace <= platform.leftSpace + platform.width
-      ) {
-        // Doodler landed on the platform
-        landedPlatform = platform;
-        this.bottomSpace = platform.bottomSpace + 15;
-        this.updatePosition();
-      }
-    });
-    return landedPlatform; // Return null if no platform is landed on
+    }, 30);
   }
 
   moveLeft() {
@@ -167,7 +169,6 @@ class Doodler {
       }
       this.updatePosition();
 
-      // Check if Doodler is still on a platform; if not, start falling
       if (!this.checkLandingOnPlatform() && !this.isFalling) {
         this.fall(); // Start falling if not on a platform
       }
@@ -182,7 +183,6 @@ class Doodler {
       }
       this.updatePosition();
 
-      // Check if Doodler is still on a platform; if not, start falling
       if (!this.checkLandingOnPlatform() && !this.isFalling) {
         this.fall(); // Start falling if not on a platform
       }
@@ -212,12 +212,10 @@ class Doodler {
   }
 
   scrollPlatforms() {
-    // Move platforms down when doodler jumps higher
     this.platforms.forEach((platform) => {
-      platform.bottomSpace -= 10; // Adjust the speed of platform scrolling
+      platform.bottomSpace -= 10; // Adjust platform scrolling speed
       platform.platformElement.style.bottom = `${platform.bottomSpace}px`;
 
-      // Remove platforms that move off the screen
       if (platform.bottomSpace < 0) {
         platform.platformElement.remove();
         this.platforms.shift(); // Remove platform from array
@@ -230,7 +228,7 @@ class Doodler {
     const highestPlatform = Math.max(
       ...this.platforms.map((p) => p.bottomSpace)
     );
-    const newPlatform = new Platform(this.container, highestPlatform + 120); // Create a new platform higher up
+    const newPlatform = new Platform(this.container, highestPlatform + 120);
     this.platforms.push(newPlatform);
   }
 
@@ -240,7 +238,21 @@ class Doodler {
   }
 
   endGame() {
-    console.log("Game Over");
-    alert(`Game Over! Your score: ${this.score}`);
+    this.gameOverSound.play(); // Play game over sound
+    document.removeEventListener("keydown", this.boundControl);
+    document.removeEventListener("keyup", this.boundStopMoving);
+
+    this.doodlerElement.remove();
+    this.clearIntervals();
+    this.platforms.forEach((platform) => platform.platformElement.remove());
+    this.platforms = [];
+
+    const gameOverScreen = document.querySelector(".game-over-container");
+    gameOverScreen.style.display = "flex";
+    document.querySelector("#final-score").innerText = `Score: ${this.score}`;
+
+    document.querySelector("#reset-button").addEventListener("click", () => {
+      location.reload();
+    });
   }
 }

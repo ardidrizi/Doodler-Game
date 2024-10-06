@@ -1,10 +1,14 @@
 body {
-  margin: 0;
-  padding: 0;
+  margin: 10px;
+  padding: 10px;
   font-family: "Arial", sans-serif;
   background-color: #f0f0f0;
   display: flex;
   justify-content: center;
+  background-image: url("/images/background.webp");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 /* Styling for the game container */
@@ -12,38 +16,15 @@ body {
   position: relative;
   width: 400px;
   height: 600px;
-  background-color: #cce7ff; /* Light blue sky */
+  background-color: #cce7ff;
   background-image: linear-gradient(
     to top,
     #87cefa,
     #cce7ff
   ); /* Gradient for sky effect */
-  border: 2px solid black;
-  overflow: hidden;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); /* Add a shadow around the container */
-}
-/* Sky background with a gradient and moving clouds */
-.game-container {
-  position: relative;
-  width: 800px;
-  height: 600px;
-  background: linear-gradient(to top, #87ceeb 60%, #e0f7fa);
-  border: 2px solid black;
+  /* border: 2px solid black; */
   overflow: hidden;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-}
-
-/* Sun in the background */
-.sun {
-  position: absolute;
-  top: 50px;
-  left: 300px;
-  width: 100px;
-  height: 100px;
-  background-color: #f7e88d; /* Sun color */
-  border-radius: 50%;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5); /* Glow effect */
-  z-index: 1;
 }
 
 /* Cloud styling */
@@ -183,6 +164,19 @@ body {
   transform: scale(0.5); /* Ensure scale is reduced */
 }
 
+/* Money board styling */
+.money-board {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 24px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 5px;
+  z-index: 100;
+}
+
 /* Applying the disappearing effect to the coin */
 
 /* Scoreboard styling */
@@ -196,4 +190,143 @@ body {
   padding: 5px 10px;
   border-radius: 5px;
   z-index: 100;
+}
+
+#start-button {
+  position: absolute;
+  top: 80%;
+  padding: 15px 70px;
+  font-size: 18px;
+  color: white;
+  background: linear-gradient(
+    135deg,
+    #00c6ff,
+    #0072ff
+  ); /* Cool blue gradient */
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 1px;
+  outline: none;
+  margin-top: 20px; /* Add margin to separate from other elements */
+}
+
+/* Hover effect */
+#start-button:hover {
+  background: linear-gradient(135deg, #0072ff, #00c6ff);
+  box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px);
+}
+
+/* Active button press effect */
+#start-button:active {
+  transform: translateY(1px);
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Styling for the instruction container */
+.instruction-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f4f8; /* Light gray-blue background */
+  text-align: center;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Soft shadow for a lifted effect */
+}
+
+/* Styling for the main heading */
+.instruction-container h1 {
+  font-size: 36px;
+  font-weight: bold;
+  color: #0072ff; /* Same blue as the button */
+  margin-bottom: 20px; /* Space between heading and instructions */
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Subtle text shadow */
+}
+
+/* Styling for the paragraph */
+.instruction-container p {
+  font-size: 24px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 10px; /* Space between paragraph and list */
+}
+
+/* Styling for the instruction list */
+.instruction-container ul {
+  list-style-type: none; /* Remove default list styling */
+  padding: 0;
+  margin: 0;
+}
+
+.instruction-container li {
+  font-size: 18px;
+  color: #555; /* Dark gray for list items */
+  background-color: #fff; /* White background for each list item */
+  padding: 10px 20px;
+  border-radius: 10px;
+  margin-bottom: 10px; /* Space between list items */
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1); /* Soft shadow for each item */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover effect for list items */
+.instruction-container li:hover {
+  transform: translateY(-3px); /* Slight lift on hover */
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+}
+
+/* Game Over container styles */
+.game-over-container {
+  display: none; /* Hidden by default */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+  color: white;
+  text-align: center;
+}
+
+.game-over-container h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.game-over-container p {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+#reset-button {
+  padding: 15px 30px;
+  font-size: 18px;
+  color: white;
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 1px;
+  outline: none;
+}
+
+#reset-button:hover {
+  background: linear-gradient(135deg, #0072ff, #00c6ff);
+  box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px);
+}
+
+#reset-button:active {
+  transform: translateY(1px);
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
 }

@@ -7,7 +7,7 @@ class Platform {
 
     // Create the platform element
     this.platformElement = document.createElement("div");
-    this.platformElement.classList.add("platform", "grass"); // Add a basic style for platforms (grass, stone, etc.)
+    this.platformElement.classList.add("platform", "grass"); // Add basic platform styles (grass, stone, etc.)
 
     // Set platform position
     this.platformElement.style.left = `${this.leftSpace}px`;
@@ -44,15 +44,18 @@ class Platform {
       // Add the disappearing class to trigger the animation
       this.coinElement.classList.add("disappearing");
 
-      // Add a small delay to ensure the animation starts before checking for animation end
       setTimeout(() => {
-        // Listen for the animation to complete before removing the coin
-        this.coinElement.addEventListener("animationend", () => {
-          console.log("Coin has disappeared. Removing from DOM.");
-          this.coinElement.remove(); // Remove the coin from the DOM
-          this.coinElement = null; // Clear the reference
-        });
-      }, 50); // Small delay to let the animation kick in
+        // Ensure the element is still there before trying to remove it
+        if (this.coinElement) {
+          this.coinElement.addEventListener("animationend", () => {
+            console.log("Coin has disappeared. Removing from DOM.");
+            if (this.coinElement) {
+              this.coinElement.remove(); // Safely remove the coin from the DOM
+              this.coinElement = null; // Clear the reference to avoid further removal
+            }
+          });
+        }
+      }, 50); // Small delay to ensure the animation starts
     }
   }
 }
