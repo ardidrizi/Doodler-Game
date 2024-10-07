@@ -9,7 +9,7 @@ A simple platformer game where you control a doodler to jump on platforms, colle
 
 - **Move left**: Press the `Left Arrow (←)` key.
 - **Move right**: Press the `Right Arrow (→)` key.
-- **Jump**: The doodler automatically jumps when landing on a platform.
+- **Jump**: Press the `Up Arrow (↑)` key.
 - **Start the Game**: Click the "Start Game" button to begin.
 
 ## Sounds
