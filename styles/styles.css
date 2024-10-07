@@ -115,24 +115,24 @@ body {
 }
 
 /* Stone platform */
-.platform.stone {
+/* .platform.stone {
   background: radial-gradient(
     circle,
     #b0b0b0,
     #808080
-  ); /* Stone-like gradient */
+  ); 
   border: 1px solid #606060;
-}
+} */
 
 /* Wooden platform */
-.platform.wood {
+/* .platform.wood {
   background: linear-gradient(
     to top,
     #8b4513 50%,
     #d2691e 50%
-  ); /* Wood plank */
+  );
   border: 1px solid #654321;
-}
+} */
 
 /* Basic styling for the coins */
 .coin {

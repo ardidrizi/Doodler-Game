@@ -3,10 +3,6 @@ class Doodler {
     this.container = container;
     this.doodlerElement = document.createElement("div");
 
-    this.jumpSound = new Audio("sounds/jump.wav"); // Add jump sound
-    this.collectCoinSound = new Audio("sounds/collect.wav");
-    this.gameOverSound = new Audio("sounds/game_over.wav");
-
     // Set doodler styles
     this.doodlerElement.style.width = "60px";
     this.doodlerElement.style.height = "60px";
@@ -15,6 +11,10 @@ class Doodler {
     this.doodlerElement.style.backgroundRepeat = "no-repeat";
     this.doodlerElement.style.borderRadius = "50%";
     this.doodlerElement.style.position = "absolute";
+
+    this.jumpSound = new Audio("sounds/jump.wav"); // Add jump sound
+    this.collectCoinSound = new Audio("sounds/collect.wav");
+    this.gameOverSound = new Audio("sounds/game_over.wav");
 
     // Set initial position
     this.leftSpace = 150;

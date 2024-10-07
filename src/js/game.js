@@ -36,11 +36,6 @@ class Game {
 const startButton = document.querySelector("#start-button");
 console.log(startButton);
 
-// restartButton.addEventListener("click", () => {
-//   location.reload();
-// });
-
-// console.log(startButton);
 startButton.addEventListener("click", () => {
   // show the game container
   document.querySelector(".instruction-container").style.display = "none";
