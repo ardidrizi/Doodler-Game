@@ -1,6 +1,7 @@
+
 ## Try Yourself => [here](https://velvety-granita-b25b3c.netlify.app/)
 
-# Doodle Jump Game
+# Doodler Game
 
 A simple platformer game where you control a doodler to jump on platforms, collect coins, and avoid falling.
 
@@ -40,3 +41,28 @@ project-root/
 ├── index.html        # Main HTML file
 └── README.md         # Project documentation
 ```
+
+## Technologies Used
+
+- **JavaScript**: Game logic and interactivity.
+- **CSS**: Styling and layout.
+- **HTML**: Markup structure.
+
+## Contributing
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature-branch`).
+3. Make your changes.
+4. Commit your changes (`git commit -m 'Add new feature'`).
+5. Push to the branch (`git push origin feature-branch`).
+6. Open a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Inspired by the classic Doodle Jump game.
+
+---
